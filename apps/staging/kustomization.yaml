@@ -1,0 +1,48 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../base/ghost
+  - namespace.yaml
+namespace: staging
+
+patches:
+  - target:
+      kind: HelmRelease
+      name: ghost
+    patch: |-
+      apiVersion: helm.toolkit.fluxcd.io/v2
+      kind: HelmRelease
+      metadata:
+        name: ghost
+      spec:
+        values:
+          resources:
+            requests:
+              cpu: 50m
+              memory: 256Mi
+            limits:
+              cpu: 200m
+              memory: 512Mi
+          ghostHost: ghost-staging.k8s.com822.dom
+          ghostProtocol: http
+
+          ingress:
+            enabled: true
+            ingressClassName: nginx
+            hostname: ghost-staging.k8s.com822.dom
+            path: /
+
+  - target:
+      kind: PerconaXtraDBCluster
+      name: ghost-db
+    patch: |-
+      apiVersion: pxc.percona.com/v1
+      kind: PerconaXtraDBCluster
+      metadata:
+        name: ghost-db
+      spec:
+        pxc:
+          resources:
+            requests:
+              memory: 256Mi
+              cpu: 100m
