@@ -1,0 +1,35 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: ghost
+spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: ghost
+      version: "19.x.x"
+      sourceRef:
+        kind: HelmRepository
+        name: bitnami
+        namespace: flux-system
+      interval: 15m
+  timeout: 15m
+  values:
+    ghostHost: "placeholder.local" # Це ми змінимо в Staging/Prod
+    ghostProtocol: "http"
+
+    # Підключення до зовнішньої бази (нашої Percona)
+    externalDatabase:
+      host: ghost-db-haproxy # Ім'я сервісу, який створить оператор
+      port: 3306
+      user: root
+      database: ghost_data
+      existingSecret: ghost-db-secrets # Беремо пароль з того ж секрету
+      existingSecretPasswordKey: root
+
+    # Вимикаємо вбудовану в чарт MariaDB (бо у нас своя)
+    mariadb:
+      enabled: false
+
+    service:
+      type: ClusterIP
