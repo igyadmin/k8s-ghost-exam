@@ -7,7 +7,7 @@ spec:
   chart:
     spec:
       chart: ghost
-      version: "19.x.x"
+      version: "21.x.x"
       sourceRef:
         kind: HelmRepository
         name: bitnami
@@ -15,6 +15,13 @@ spec:
       interval: 15m
   timeout: 15m
   values:
+ # --- ВИПРАВЛЕННЯ ОБРАЗУ ---
+    image:
+      registry: docker.io
+      repository: library/ghost
+      tag: 5-alpine  # Використовуємо легкий офіційний образ
+      pullPolicy: IfNotPresent
+    # --------------------------
     ghostHost: "placeholder.local" # Це ми змінимо в Staging/Prod
     ghostProtocol: "http"
 
