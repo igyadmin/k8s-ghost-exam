@@ -25,3 +25,5 @@ spec:
         namespace: flux-system
   values:
     watchNamespace: ""
+    pvc:
+      storageClassName: longhorn
