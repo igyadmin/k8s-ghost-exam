@@ -13,6 +13,7 @@ spec:
     image: percona/percona-xtradb-cluster:8.0.32-24.2
     volumeSpec:
       persistentVolumeClaim:
+        storageClassName: "longhorn"
         resources:
           requests:
             storage: 2Gi
