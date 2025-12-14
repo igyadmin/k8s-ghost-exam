@@ -3,40 +3,25 @@ kind: HelmRelease
 metadata:
   name: ghost
 spec:
-  interval: 15m
+  interval: 5m
   chart:
     spec:
-      chart: ghost
-      version: "21.x.x"
+      # --- ВАЖЛИВА ЗМІНА ---
+      # Ми кажемо Flux брати чарт з Git-репозиторію, а не з Helm-репозиторію
+      chart: ./charts/ghost
       sourceRef:
-        kind: HelmRepository
-        name: bitnami
+        kind: GitRepository
+        name: flux-system
         namespace: flux-system
-      interval: 15m
-  timeout: 15m
+      # ---------------------
   values:
- # --- ВИПРАВЛЕННЯ ОБРАЗУ ---
+    # Передаємо реальні налаштування
+    env:
+      url: "http://ghost-staging.k8s.com822.dom" # Це заміниться в Staging
+      database__connection__host: "ghost-db-haproxy"
+      database__connection__user: "root"
+      database__connection__database: "ghost_data"
+    
     image:
-      registry: docker.io
-      repository: library/ghost
-      tag: 5-alpine  # Використовуємо легкий офіційний образ
-      pullPolicy: IfNotPresent
-    # --------------------------
-    ghostHost: "placeholder.local" # Це ми змінимо в Staging/Prod
-    ghostProtocol: "http"
-
-    # Підключення до зовнішньої бази (нашої Percona)
-    externalDatabase:
-      host: ghost-db-haproxy # Ім'я сервісу, який створить оператор
-      port: 3306
-      user: root
-      database: ghost_data
-      existingSecret: ghost-db-secrets # Беремо пароль з того ж секрету
-      existingSecretPasswordKey: root
-
-    # Вимикаємо вбудовану в чарт MariaDB (бо у нас своя)
-    mariadb:
-      enabled: false
-
-    service:
-      type: ClusterIP
+      repository: ghost
+      tag: 5.130.5-alpine

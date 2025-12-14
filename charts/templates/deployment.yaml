@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+    app: ghost
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: ghost
+  template:
+    metadata:
+      labels:
+        app: ghost
+    spec:
+      containers:
+        - name: ghost
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: 2368
+          env:
+            - name: url
+              value: {{ .Values.env.url }}
+            - name: database__client
+              value: "mysql"
+            - name: database__connection__host
+              value: {{ .Values.env.database__connection__host }}
+            - name: database__connection__user
+              value: {{ .Values.env.database__connection__user }}
+            - name: database__connection__database:
+              value: {{ .Values.env.database__connection__database }}
+            - name: database__connection__password
+              valueFrom:
+                secretKeyRef:
+                  name: ghost-db-secrets
+                  key: root
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - mountPath: /var/lib/ghost/content
+              name: ghost-data
+      volumes:
+        - name: ghost-data
+          persistentVolumeClaim:
+            claimName: ghost-pvc
