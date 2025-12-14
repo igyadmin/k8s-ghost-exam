@@ -29,7 +29,7 @@ spec:
               value: {{ .Values.env.database__connection__host }}
             - name: database__connection__user
               value: {{ .Values.env.database__connection__user }}
-            - name: database__connection__database:
+            - name: database__connection__database
               value: {{ .Values.env.database__connection__database }}
             - name: database__connection__password
               valueFrom:
