@@ -23,7 +23,11 @@ spec:
         kind: HelmRepository
         name: percona
         namespace: flux-system
+  # --- ЗМІНИ ТУТ ---
   values:
     watchNamespace: ""
-    pvc:
-      storageClassName: longhorn
+    # Додаємо CLUSTER ROLE BINDING явно, щоб він мав права
+    rbac:
+      create: true
+      createClusterRole: true
+  # -----------------
