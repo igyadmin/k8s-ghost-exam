@@ -18,25 +18,30 @@ spec:
       {{- if .Values.storage.s3.enabled }}
       initContainers:
         - name: install-s3-adapter
-          image: node:18-alpine
-            command:
+          # ВИКОРИСТОВУЄМО DEBIAN ЗАМІСТЬ ALPINE (Стабільніший npm)
+          image: node:18-slim
+          command:
             - sh
             - -c
             - |
-              # 1. Створюємо чисту тимчасову папку і переходимо в неї
-              mkdir -p /tmp/install
-              cd /tmp/install
+              # 1. Йдемо в тимчасову папку
+              mkdir -p /tmp/s3-install
+              cd /tmp/s3-install
 
-              # 2. Встановлюємо пакет (без збереження в package.json і без lock-файлу)
+              # 2. Створюємо порожній package.json (це лікує помилку idealTree)
+              npm init -y
+
+              # 3. Встановлюємо плагін без зайвих питань
               echo "Installing S3 adapter..."
-              npm install ghost-storage-adapter-s3 --no-save --no-package-lock
+              npm install ghost-storage-adapter-s3 --no-audit --no-fund
 
-              # 3. Копіюємо результати у спільний том
+              # 4. Копіюємо (тільки вміст папки пакета)
               mkdir -p /plugin-volume
+              # В залежності від структури, шлях може бути трохи іншим, тому копіюємо надійно:
               cp -r node_modules/ghost-storage-adapter-s3/* /plugin-volume/
 
               echo "Done!"
-              ls -la /plugin-volume
+              ls -la /plugin-volume/
           volumeMounts:
             - name: s3-adapter-volume
               mountPath: /plugin-volume
