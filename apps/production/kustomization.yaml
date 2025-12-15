@@ -1,0 +1,60 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../base/ghost
+  - namespace.yaml
+  - hpa.yaml
+namespace: production
+
+patches:
+  # 1. Налаштування Ghost (HelmRelease)
+  - target:
+      kind: HelmRelease
+      name: ghost
+    patch: |-
+      apiVersion: helm.toolkit.fluxcd.io/v2
+      kind: HelmRelease
+      metadata:
+        name: ghost
+      spec:
+        values:
+          # Production URL
+          env:
+            url: "http://ghost.k8s.com822.dom"
+
+          # Ресурси для Ghost (більше, ніж в Staging)
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+
+          # У Production репліками керує HPA, тому тут фіксувати не обов'язково,
+          # але для старту ставимо null, щоб не конфліктувати з HPA
+          replicaCount: null
+
+  # 2. Налаштування Бази Даних (Percona Cluster)
+  - target:
+      kind: PerconaXtraDBCluster
+      name: ghost-db
+    patch: |-
+      apiVersion: pxc.percona.com/v1
+      kind: PerconaXtraDBCluster
+      metadata:
+        name: ghost-db
+      spec:
+        pxc:
+          size: 3 # Три ноди для відмовостійкості
+          resources:
+            requests:
+              memory: 1Gi # Нормальна пам'ять, щоб не гальмувало
+              cpu: 500m
+        haproxy:
+          enabled: true
+          size: 2 # Два балансувальники для надійності
+          resources:
+            requests:
+              memory: 512Mi
+              cpu: 300m
