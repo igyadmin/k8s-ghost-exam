@@ -12,7 +12,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: bitnami
-        namespace: infrastructure
+        namespace: flux-system
   values:
     # Standalone - одна нода, без кластеризації Galera. Швидко і надійно.
     architecture: standalone

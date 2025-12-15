@@ -32,26 +32,3 @@ patches:
             hostname: ghost-staging.k8s.com822.dom
             path: /
 
-  - target:
-      kind: PerconaXtraDBCluster
-      name: ghost-db
-    patch: |-
-      apiVersion: pxc.percona.com/v1
-      kind: PerconaXtraDBCluster
-      metadata:
-        name: ghost-db
-      spec:
-        allowUnsafeConfigurations: true
-        pxc:
-          resources:
-            requests:
-              memory: 512Mi
-              cpu: 200m
-        haproxy:
-          resources:
-            requests:
-              cpu: 200m      # Даємо більше процесора (було мало)
-              memory: 256Mi  # Даємо більше пам'яті
-            limits:
-              cpu: 500m
-              memory: 512Mi
