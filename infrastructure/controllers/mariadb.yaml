@@ -16,7 +16,11 @@ spec:
   values:
     # Standalone - одна нода, без кластеризації Galera. Швидко і надійно.
     architecture: standalone
+    image:
+      registry: docker.io
+      repository: bitnami/mariadb
 
+      tag: "latest"
     auth:
       rootPassword: "root_password"
       database: "ghost_db"
