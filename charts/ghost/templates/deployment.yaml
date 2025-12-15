@@ -41,7 +41,7 @@ spec:
           volumeMounts:
             - mountPath: /var/lib/ghost/content
               name: ghost-data
-      volumes:
-        - name: ghost-data
-          persistentVolumeClaim:
-            claimName: ghost-pvc
+#      volumes:
+#        - name: ghost-data
+#          persistentVolumeClaim:
+#            claimName: ghost-pvc
