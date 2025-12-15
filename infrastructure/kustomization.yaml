@@ -3,3 +3,4 @@ kind: Kustomization
 resources:
   - controllers/pxc-operator.yaml
   - configs/bitnami-repo.yaml
+  - controllers/pxc-rbac.yaml
