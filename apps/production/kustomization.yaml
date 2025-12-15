@@ -63,7 +63,7 @@ patches:
             database__connection__database: ghost_db
 
             storage__active: s3
-            storage__s3__endpoint: http://minio.infrastructure.svc.cluster.local:9000
+            storage__s3__endpoint: http://minio.minio.svc.k8s.com822.dom:9000
             storage__s3__bucket: ghost-bucket
             storage__s3__forcePathStyle: "true" # Важливо для MinIO
             storage__s3__accessKeyId: admin
