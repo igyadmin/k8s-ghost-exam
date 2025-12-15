@@ -20,31 +20,36 @@ spec:
         - name: install-s3-adapter
           # ВИКОРИСТОВУЄМО DEBIAN ЗАМІСТЬ ALPINE (Стабільніший npm)
           image: node:18-slim
+          securityContext:
+            runAsUser: 0 # Запускаємо від root, щоб працював chown
           command:
             - sh
             - -c
             - |
-              # 1. Готуємо тимчасове середовище
-              mkdir -p /tmp/s3-install
-              cd /tmp/s3-install
+              # 1. Встановлюємо плагін у тимчасову папку
+              mkdir -p /tmp/install
+              cd /tmp/install
               npm init -y
-
-              # 2. Встановлюємо пакет
-              echo "Installing S3 adapter..."
               npm install ghost-storage-adapter-s3 --no-audit --no-fund
 
-              # 3. Готуємо цільову папку (ЗВЕРНИ УВАГУ НА ШЛЯХ)
-              # Ми монтуємо том у /plugin-volume
-              # Але Ghost шукає в adapters/storage/s3
-              # Тому ми створюємо цю структуру тут:
+              # 2. Очищаємо цільовий том (на випадок сміття)
+              rm -rf /plugin-volume/*
 
-              mkdir -p /plugin-volume/storage/s3
+              # 3. Копіюємо вміст пакета ПРЯМО В КОРІНЬ тому
+              # (щоб index.js лежав одразу в /plugin-volume/index.js)
+              cp -r node_modules/ghost-storage-adapter-s3/* /plugin-volume/
 
-              # 4. Копіюємо вміст пакета у правильне місце
-              cp -r node_modules/ghost-storage-adapter-s3/* /plugin-volume/storage/s3/
+              # 4. ВАЖЛИВО: Змінюємо власника на node (1000:1000)
+              # Офіційний образ Ghost працює від юзера 1000.
+              # Без цього Ghost не бачить файлів!
+              chown -R 1000:1000 /plugin-volume
 
-              echo "Files in destination:"
-              ls -R /plugin-volume
+              echo "Files inside volume:"
+              ls -la /plugin-volume
+          volumeMounts:
+            - name: s3-adapter-volume
+              mountPath: /plugin-volume
+      {{- end }}
           volumeMounts:
             - name: s3-adapter-volume
               mountPath: /plugin-volume
