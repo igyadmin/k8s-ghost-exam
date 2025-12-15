@@ -26,20 +26,29 @@ spec:
             - sh
             - -c
             - |
-              mkdir -p /tmp/install && cd /tmp/install
+              # 1. Йдемо одразу в цільовий том
+              cd /plugin-volume
+
+              # 2. Чистимо том від старого (на всяк випадок)
+              rm -rf ./*
+
+              # 3. Ініціалізуємо і ставимо пакет ТУТ
               npm init -y
-              npm install ghost-storage-adapter-s3 --no-audit --no-fund
+              npm install ghost-storage-adapter-s3 --save
 
-              # Чистимо том
-              rm -rf /plugin-volume/*
+              # 4. ТРЮК: Витягуємо код адаптера в корінь папки s3
+              # Ghost шукає index.js у /storage/s3/index.js
+              # А npm поклав його у /storage/s3/node_modules/ghost-storage-adapter-s3/index.js
+              cp -r node_modules/ghost-storage-adapter-s3/* .
 
-              # Копіюємо (плоско, без зайвих папок)
-              cp -r node_modules/ghost-storage-adapter-s3/* /plugin-volume/
+              # 5. ВАЖЛИВО: НЕ ВИДАЛЯЙ node_modules!
+              # Там лежать aws-sdk та інші залежності, які потрібні адаптеру.
 
-              # Віддаємо права Ghost (це супер важливо!)
-              chown -R 1000:1000 /plugin-volume
+              # 6. Віддаємо права Ghost
+              chown -R 1000:1000 .
 
-              ls -la /plugin-volume
+              echo "Contents of S3 folder:"
+              ls -la
           volumeMounts:
             - name: s3-adapter-volume
               mountPath: /plugin-volume
