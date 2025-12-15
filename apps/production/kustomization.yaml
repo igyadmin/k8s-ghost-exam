@@ -7,7 +7,6 @@ resources:
 namespace: production
 
 patches:
-  # 1. Налаштування Ghost (HelmRelease)
   - target:
       kind: HelmRelease
       name: ghost
@@ -18,12 +17,9 @@ patches:
         name: ghost
       spec:
         values:
-          # Production URL
           env:
             url: "http://ghost.k8s.com822.dom"
-
-          # Ресурси для Ghost (більше, ніж в Staging)
-          resources:
+            resources:
             requests:
               cpu: 100m
               memory: 256Mi
@@ -31,8 +27,6 @@ patches:
               cpu: 500m
               memory: 512Mi
 
-          # У Production репліками керує HPA, тому тут фіксувати не обов'язково,
-          # але для старту ставимо null, щоб не конфліктувати з HPA
           replicaCount: null
           persistence:
             enabled: false
@@ -58,18 +52,15 @@ patches:
                 - name: s3-adapter
                   mountPath: /plugin-volume
           env:
-            # Основні
             url: "http://ghost.k8s.com822.dom"
             NODE_ENV: production
 
-            # База даних (MySQL)
             database__client: mysql
             database__connection__host: ghost-db-haproxy
             database__connection__user: ghost
             database__connection__password: ghost_password
             database__connection__database: ghost_db
 
-            # Storage (S3 / MinIO)
             storage__active: s3
             storage__s3__endpoint: http://minio.infrastructure.svc.cluster.local:9000
             storage__s3__bucket: ghost-bucket
@@ -77,7 +68,6 @@ patches:
             storage__s3__accessKeyId: admin
             storage__s3__secretAccessKey: admin123
             storage__s3__signatureVersion: v4
-  # 2. Налаштування Бази Даних (Percona Cluster)
   - target:
       kind: PerconaXtraDBCluster
       name: ghost-db
