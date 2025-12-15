@@ -41,10 +41,11 @@ patches:
       metadata:
         name: ghost-db
       spec:
+        allowUnsafeConfigurations: true
         pxc:
           resources:
             requests:
-              memory: 1Gi
+              memory: 512Mi
               cpu: 200m
         haproxy:
           resources:
