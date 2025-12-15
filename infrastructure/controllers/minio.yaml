@@ -15,7 +15,7 @@ spec:
         namespace: flux-system
   values:
     rootUser: admin
-    rootPassword: "admin" # У реальному проді це має бути Secret
+    rootPassword: "admin123" # У реальному проді це має бути Secret
 
     # Вимикаємо розподілений режим (нам вистачить однієї репліки для лаби)
     mode: standalone
