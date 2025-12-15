@@ -34,3 +34,10 @@ spec:
       ports:
         api: 9000
         console: 9001
+    resources:
+      requests:
+        memory: 128Mi  # "Я займу зовсім трошки місця, чесно!"
+        cpu: 100m
+      limits:
+        memory: 1Gi    # "Але якщо буде вільно - візьму гігабайт"
+        cpu: 1000m
