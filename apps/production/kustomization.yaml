@@ -57,13 +57,13 @@ patches:
               volumeMounts:
                 - name: s3-adapter
                   mountPath: /plugin-volume
-           configuration: |
-             {
+          configuration: |
+            {
               "url": "http://ghost.k8s.com822.dom",
               "server": {
                 "port": 2368,
                 "host": "0.0.0.0"
-              },
+               },
               "database": {
                 "client": "mysql",
                 "connection": {
@@ -72,15 +72,15 @@ patches:
                   "password": "ghost_password",
                   "database": "ghost_db"
                 }
-              },
+               },
               "mail": {
                 "transport": "Direct"
-              },
+               },
               "logging": {
                 "transports": [
                   "stdout"
                 ]
-              },
+               },
               "storage": {
                 "active": "s3",
                 "s3": {
@@ -91,7 +91,7 @@ patches:
                   "secretAccessKey": "admin123",
                   "signatureVersion": "v4"
                 }
-              }
+               }
              }
   # 2. Налаштування Бази Даних (Percona Cluster)
   - target:
