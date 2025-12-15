@@ -57,6 +57,42 @@ patches:
               volumeMounts:
                 - name: s3-adapter
                   mountPath: /plugin-volume
+           configuration: |
+             {
+              "url": "http://ghost.k8s.com822.dom",
+              "server": {
+                "port": 2368,
+                "host": "0.0.0.0"
+              },
+              "database": {
+                "client": "mysql",
+                "connection": {
+                  "host": "ghost-db-haproxy",
+                  "user": "ghost",
+                  "password": "ghost_password",
+                  "database": "ghost_db"
+                }
+              },
+              "mail": {
+                "transport": "Direct"
+              },
+              "logging": {
+                "transports": [
+                  "stdout"
+                ]
+              },
+              "storage": {
+                "active": "s3",
+                "s3": {
+                  "endpoint": "http://minio.minio.svc.cluster.local:9000",
+                  "bucket": "ghost-bucket",
+                  "forcePathStyle": true,
+                  "accessKeyId": "admin",
+                  "secretAccessKey": "admin123",
+                  "signatureVersion": "v4"
+                }
+              }
+             }
   # 2. Налаштування Бази Даних (Percona Cluster)
   - target:
       kind: PerconaXtraDBCluster
