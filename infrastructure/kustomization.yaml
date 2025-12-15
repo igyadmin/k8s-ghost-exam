@@ -4,5 +4,6 @@ resources:
   - controllers/namespace.yaml
   - controllers/pxc-operator.yaml
   - configs/bitnami-repo.yaml
+  - configs/minio.repo
   - controllers/pxc-rbac.yaml
   - controllers/minio.yaml
