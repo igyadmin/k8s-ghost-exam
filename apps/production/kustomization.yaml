@@ -69,25 +69,3 @@ patches:
             storage__s3__accessKeyId: admin
             storage__s3__secretAccessKey: admin123
             storage__s3__signatureVersion: v4
-  - target:
-      kind: PerconaXtraDBCluster
-      name: ghost-db
-    patch: |-
-      apiVersion: pxc.percona.com/v1
-      kind: PerconaXtraDBCluster
-      metadata:
-        name: ghost-db
-      spec:
-        pxc:
-          size: 3
-          resources:
-            requests:
-              memory: 1Gi
-              cpu: 500m
-        haproxy:
-          enabled: true
-          size: 2
-          resources:
-            requests:
-              memory: 512Mi
-              cpu: 300m
