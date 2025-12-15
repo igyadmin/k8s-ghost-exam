@@ -50,15 +50,14 @@ spec:
             - name: s3-adapter-volume
               mountPath: /plugin-volume
       {{- end }}
-#          volumeMounts:
-#            - name: s3-adapter-volume
-#              mountPath: /plugin-volume
-#      {{- end }}
+
 
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["/bin/sh"]
+          args: ["-c", "echo 'Sleeping...'; sleep 3600"]
           ports:
             - name: http
               containerPort: 2368
