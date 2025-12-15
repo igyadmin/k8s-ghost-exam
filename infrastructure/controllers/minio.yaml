@@ -14,9 +14,8 @@ spec:
         name: minio
         namespace: flux-system
   values:
-    auth:
-      rootUser: rootuser
-      rootPassword: "rootpass123" # У реальному проді це має бути Secret
+    rootUser: admin
+    rootPassword: "admin" # У реальному проді це має бути Secret
 
     # Вимикаємо розподілений режим (нам вистачить однієї репліки для лаби)
     mode: standalone
