@@ -57,42 +57,26 @@ patches:
               volumeMounts:
                 - name: s3-adapter
                   mountPath: /plugin-volume
-          configuration: |
-            {
-              "url": "http://ghost.k8s.com822.dom",
-              "server": {
-                "port": 2368,
-                "host": "0.0.0.0"
-               },
-              "database": {
-                "client": "mysql",
-                "connection": {
-                  "host": "ghost-db-haproxy",
-                  "user": "ghost",
-                  "password": "ghost_password",
-                  "database": "ghost_db"
-                }
-               },
-              "mail": {
-                "transport": "Direct"
-               },
-              "logging": {
-                "transports": [
-                  "stdout"
-                ]
-               },
-              "storage": {
-                "active": "s3",
-                "s3": {
-                  "endpoint": "http://minio.minio.svc.k8s.com822.dom:9000",
-                  "bucket": "ghost-bucket",
-                  "forcePathStyle": true,
-                  "accessKeyId": "admin",
-                  "secretAccessKey": "admin123",
-                  "signatureVersion": "v4"
-                }
-               }
-             }
+          env:
+            # Основні
+            url: "http://ghost.k8s.com822.dom"
+            NODE_ENV: production
+
+            # База даних (MySQL)
+            database__client: mysql
+            database__connection__host: ghost-db-haproxy
+            database__connection__user: ghost
+            database__connection__password: ghost_password
+            database__connection__database: ghost_db
+
+            # Storage (S3 / MinIO)
+            storage__active: s3
+            storage__s3__endpoint: http://minio.infrastructure.svc.cluster.local:9000
+            storage__s3__bucket: ghost-bucket
+            storage__s3__forcePathStyle: "true" # Важливо для MinIO
+            storage__s3__accessKeyId: admin
+            storage__s3__secretAccessKey: admin123
+            storage__s3__signatureVersion: v4
   # 2. Налаштування Бази Даних (Percona Cluster)
   - target:
       kind: PerconaXtraDBCluster
