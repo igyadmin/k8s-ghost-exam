@@ -34,7 +34,29 @@ patches:
           # У Production репліками керує HPA, тому тут фіксувати не обов'язково,
           # але для старту ставимо null, щоб не конфліктувати з HPA
           replicaCount: null
-
+          persistence:
+            enabled: false
+          extraVolumes:
+            - name: s3-adapter
+              emptyDir: {}
+          extraVolumeMounts:
+            - name: s3-adapter
+              mountPath: /var/lib/ghost/content/adapters/storage/s3
+          initContainers:
+            - name: install-s3
+              image: node:18-alpine
+              command:
+                - sh
+                - -c
+                - |
+                  echo "Installing S3 adapter..."
+                  npm install ghost-storage-adapter-s3
+                  mkdir -p /plugin-volume/
+                  cp -r node_modules/ghost-storage-adapter-s3/* /plugin-volume/
+                  ls -la /plugin-volume/
+              volumeMounts:
+                - name: s3-adapter
+                  mountPath: /plugin-volume
   # 2. Налаштування Бази Даних (Percona Cluster)
   - target:
       kind: PerconaXtraDBCluster
@@ -46,14 +68,14 @@ patches:
         name: ghost-db
       spec:
         pxc:
-          size: 3 # Три ноди для відмовостійкості
+          size: 3
           resources:
             requests:
-              memory: 1Gi # Нормальна пам'ять, щоб не гальмувало
+              memory: 1Gi
               cpu: 500m
         haproxy:
           enabled: true
-          size: 2 # Два балансувальники для надійності
+          size: 2
           resources:
             requests:
               memory: 512Mi
