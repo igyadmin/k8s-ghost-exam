@@ -44,5 +44,13 @@ patches:
         pxc:
           resources:
             requests:
-              memory: 256Mi
-              cpu: 100m
+              memory: 1Gi
+              cpu: 200m
+        haproxy:
+          resources:
+            requests:
+              cpu: 200m      # Даємо більше процесора (було мало)
+              memory: 256Mi  # Даємо більше пам'яті
+            limits:
+              cpu: 500m
+              memory: 512Mi
