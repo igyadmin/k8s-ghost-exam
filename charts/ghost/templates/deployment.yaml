@@ -18,45 +18,42 @@ spec:
       {{- if .Values.storage.s3.enabled }}
       initContainers:
         - name: install-s3-adapter
-          # ВИКОРИСТОВУЄМО DEBIAN ЗАМІСТЬ ALPINE (Стабільніший npm)
           image: node:18-slim
           securityContext:
-            runAsUser: 0 # Запускаємо від root, щоб працював chown
-            command:
+            runAsUser: 0 # Root потрібен для chown
+          command:
             - sh
             - -c
             - |
-              # 1. Йдемо одразу в цільовий том
+              # Йдемо в цільову папку
               cd /plugin-volume
 
-              # 2. Чистимо том від старого (на всяк випадок)
-              rm -rf ./*
+              # Очищаємо (на всяк випадок)
+              rm -rf *
 
-              # 3. Ініціалізуємо і ставимо пакет ТУТ
-              npm init -y
-              npm install ghost-storage-adapter-s3 --save
+              # 1. Скачуємо архів пакету (це надійніше, ніж install + cp)
+              npm pack ghost-storage-adapter-s3
 
-              # 4. ТРЮК: Витягуємо код адаптера в корінь папки s3
-              # Ghost шукає index.js у /storage/s3/index.js
-              # А npm поклав його у /storage/s3/node_modules/ghost-storage-adapter-s3/index.js
-              cp -r node_modules/ghost-storage-adapter-s3/* .
+              # 2. Розпаковуємо архів прямо сюди (--strip-components прибирає папку 'package')
+              tar -xzf *.tgz --strip-components=1
+              rm *.tgz
 
-              # 5. ВАЖЛИВО: НЕ ВИДАЛЯЙ node_modules!
-              # Там лежать aws-sdk та інші залежності, які потрібні адаптеру.
+              # 3. Встановлюємо залежності (aws-sdk та інші) ПРЯМО ТУТ
+              npm install --omit=dev
 
-              # 6. Віддаємо права Ghost
-              chown -R 1000:1000 .
-
-              echo "Contents of S3 folder:"
+              # 4. Перевіряємо, що index.js на місці
               ls -la
+
+              # 5. Віддаємо права юзеру node (1000)
+              chown -R 1000:1000 .
           volumeMounts:
             - name: s3-adapter-volume
               mountPath: /plugin-volume
       {{- end }}
-          volumeMounts:
-            - name: s3-adapter-volume
-              mountPath: /plugin-volume
-      {{- end }}
+#          volumeMounts:
+#            - name: s3-adapter-volume
+#              mountPath: /plugin-volume
+#      {{- end }}
 
       containers:
         - name: {{ .Chart.Name }}
