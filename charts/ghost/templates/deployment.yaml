@@ -19,14 +19,24 @@ spec:
       initContainers:
         - name: install-s3-adapter
           image: node:18-alpine
-          command:
+            command:
             - sh
             - -c
             - |
+              # 1. Створюємо чисту тимчасову папку і переходимо в неї
+              mkdir -p /tmp/install
+              cd /tmp/install
+
+              # 2. Встановлюємо пакет (без збереження в package.json і без lock-файлу)
               echo "Installing S3 adapter..."
-              npm install ghost-storage-adapter-s3
-              mkdir -p /plugin-volume/
+              npm install ghost-storage-adapter-s3 --no-save --no-package-lock
+
+              # 3. Копіюємо результати у спільний том
+              mkdir -p /plugin-volume
               cp -r node_modules/ghost-storage-adapter-s3/* /plugin-volume/
+
+              echo "Done!"
+              ls -la /plugin-volume
           volumeMounts:
             - name: s3-adapter-volume
               mountPath: /plugin-volume
