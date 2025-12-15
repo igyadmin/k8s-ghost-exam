@@ -24,24 +24,27 @@ spec:
             - sh
             - -c
             - |
-              # 1. Йдемо в тимчасову папку
+              # 1. Готуємо тимчасове середовище
               mkdir -p /tmp/s3-install
               cd /tmp/s3-install
-
-              # 2. Створюємо порожній package.json (це лікує помилку idealTree)
               npm init -y
 
-              # 3. Встановлюємо плагін без зайвих питань
+              # 2. Встановлюємо пакет
               echo "Installing S3 adapter..."
               npm install ghost-storage-adapter-s3 --no-audit --no-fund
 
-              # 4. Копіюємо (тільки вміст папки пакета)
-              mkdir -p /plugin-volume
-              # В залежності від структури, шлях може бути трохи іншим, тому копіюємо надійно:
-              cp -r node_modules/ghost-storage-adapter-s3/* /plugin-volume/
+              # 3. Готуємо цільову папку (ЗВЕРНИ УВАГУ НА ШЛЯХ)
+              # Ми монтуємо том у /plugin-volume
+              # Але Ghost шукає в adapters/storage/s3
+              # Тому ми створюємо цю структуру тут:
 
-              echo "Done!"
-              ls -la /plugin-volume/
+              mkdir -p /plugin-volume/storage/s3
+
+              # 4. Копіюємо вміст пакета у правильне місце
+              cp -r node_modules/ghost-storage-adapter-s3/* /plugin-volume/storage/s3/
+
+              echo "Files in destination:"
+              ls -R /plugin-volume
           volumeMounts:
             - name: s3-adapter-volume
               mountPath: /plugin-volume
