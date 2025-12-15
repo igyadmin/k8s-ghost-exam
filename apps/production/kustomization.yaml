@@ -16,10 +16,17 @@ patches:
       metadata:
         name: ghost
       spec:
+        # Інтервал звірки (можна збільшити для проду)
+        interval: 1h
         values:
-          env:
-            url: "http://ghost.k8s.com822.dom"
-            resources:
+          # --- ГОЛОВНІ НАЛАШТУВАННЯ ---
+          url: "http://ghost.k8s.com822.dom"
+
+          # Керування репліками віддаємо HPA
+          replicaCount: null
+
+          # Ресурси для Production
+          resources:
             requests:
               cpu: 100m
               memory: 256Mi
@@ -27,45 +34,26 @@ patches:
               cpu: 500m
               memory: 512Mi
 
-          replicaCount: null
+          # --- СХОВИЩЕ ---
+          # Вимикаємо локальний PVC (важливо, щоб Helm не створив диск)
           persistence:
             enabled: false
-          extraVolumes:
-            - name: s3-adapter
-              emptyDir: {}
-          extraVolumeMounts:
-            - name: s3-adapter
-              mountPath: /var/lib/ghost/content/adapters/storage/s3
-          initContainers:
-            - name: install-s3
-              image: node:18-alpine
-              command:
-                - sh
-                - -c
-                - |
-                  echo "Installing S3 adapter..."
-                  npm install ghost-storage-adapter-s3
-                  mkdir -p /plugin-volume/
-                  cp -r node_modules/ghost-storage-adapter-s3/* /plugin-volume/
-                  ls -la /plugin-volume/
-              volumeMounts:
-                - name: s3-adapter
-                  mountPath: /plugin-volume
-          env:
-            url: "http://ghost.k8s.com822.dom"
-            NODE_ENV: production
 
-            database__client: mysql
-            database__connection__host: mariadb.infrastructure.svc.k8s.com822.dom
-            database__connection__port: 3306
-            database__connection__user: ghost
-            database__connection__password: ghost_password
-            database__connection__database: ghost_db
+          # Вмикаємо S3 (Чарт сам додасть плагін та змінні середовища)
+          storage:
+            s3:
+              enabled: true
+              endpoint: "http://minio.infrastructure.svc.k8s.com822.dom:9000"
+              bucket: "ghost-bucket"
+              region: "us-east-1" # Стандарт для MinIO
+              accessKey: "admin"
+              secretKey: "admin123" # Перевір, чи тут актуальний пароль
 
-            storage__active: s3
-            storage__s3__endpoint: http://minio.minio.svc.k8s.com822.dom:9000
-            storage__s3__bucket: ghost-bucket
-            storage__s3__forcePathStyle: "true" # Важливо для MinIO
-            storage__s3__accessKeyId: admin
-            storage__s3__secretAccessKey: admin123
-            storage__s3__signatureVersion: v4
+          # --- БАЗА ДАНИХ (MariaDB) ---
+          externalDatabase:
+            client: mysql
+            host: mariadb.infrastructure.svc.k8s.com822.dom
+            port: 3306
+            user: ghost
+            password: ghost_password
+            database: ghost_db

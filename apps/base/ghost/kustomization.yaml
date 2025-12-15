@@ -4,13 +4,3 @@ resources:
 #  - db.yaml
   - release.yaml
 
-secretGenerator:
-  - name: ghost-db-secrets
-    literals:
-      - root=VeryStrongRootPass123!
-      - xtrabackup=BackupPass123!
-      - monitor=MonitorPass123!
-      - clustercheck=ClusterCheckPass123!
-      - operator=OperatorPass123!
-    options:
-      disableNameSuffixHash: true

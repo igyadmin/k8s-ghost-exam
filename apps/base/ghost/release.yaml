@@ -21,7 +21,7 @@ spec:
       database__connection__host: "ghost-db-haproxy"
       database__connection__user: "root"
       database__connection__database: "ghost_data"
-    
+
     image:
       repository: ghost
       tag: 5.130.5-alpine

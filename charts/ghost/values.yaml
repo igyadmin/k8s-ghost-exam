@@ -8,19 +8,46 @@ image:
 service:
   type: ClusterIP
   port: 80
+  targetPort: 2368
 
 ingress:
   enabled: false
   className: ""
-  host: "chart-example.local"
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
 
-# Змінні середовища для підключення до БД
-env:
-  url: "http://localhost:2368"
-  database__client: "mysql"
-  database__connection__host: "mysql"
-  database__connection__user: "root"
-  database__connection__database: "ghost_data"
-  # Пароль будемо брати через secretKeyRef у deployment.yaml, тут не пишемо
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
 
-resources: {}
+url: "http://localhost"
+
+externalDatabase:
+  client: mysql
+  host: mariadb.infrastructure.svc.k8s.com822.dom
+  port: 3306
+  user: ghost
+  password: ghost_password
+  database: ghost_db
+
+persistence:
+  enabled: true
+  storageClass: ""
+  size: 5Gi
+  path: /var/lib/ghost/content
+
+storage:
+  s3:
+    enabled: false
+    region: "us-east-1"
+    endpoint: "http://minio.infrastructure.svc.cluster.local:9000"
+    bucket: "ghost-bucket"
+    accessKey: "admin"
+    secretKey: "admin123"

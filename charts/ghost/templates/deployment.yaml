@@ -1,47 +1,113 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Release.Name }}
+  name: {{ include "ghost.fullname" . }}
   labels:
-    app: ghost
+    {{- include "ghost.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: ghost
+      {{- include "ghost.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        app: ghost
+        {{- include "ghost.selectorLabels" . | nindent 8 }}
     spec:
+      # --- INIT CONTAINER (Тільки якщо S3 увімкнено) ---
+      {{- if .Values.storage.s3.enabled }}
+      initContainers:
+        - name: install-s3-adapter
+          image: node:18-alpine
+          command:
+            - sh
+            - -c
+            - |
+              echo "Installing S3 adapter..."
+              npm install ghost-storage-adapter-s3
+              mkdir -p /plugin-volume/
+              cp -r node_modules/ghost-storage-adapter-s3/* /plugin-volume/
+          volumeMounts:
+            - name: s3-adapter-volume
+              mountPath: /plugin-volume
+      {{- end }}
+
       containers:
-        - name: ghost
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - containerPort: 2368
+            - name: http
+              containerPort: 2368
+              protocol: TCP
+
+          # --- ЗМІННІ СЕРЕДОВИЩА (Налаштування) ---
           env:
             - name: url
-              value: {{ .Values.env.url }}
+              value: {{ .Values.url | quote }}
+            - name: NODE_ENV
+              value: production
+
+            # База Даних (MariaDB)
             - name: database__client
-              value: "mysql"
+              value: {{ .Values.externalDatabase.client | quote }}
             - name: database__connection__host
-              value: {{ .Values.env.database__connection__host }}
+              value: {{ .Values.externalDatabase.host | quote }}
+            - name: database__connection__port
+              value: {{ .Values.externalDatabase.port | quote }}
             - name: database__connection__user
-              value: {{ .Values.env.database__connection__user }}
-            - name: database__connection__database
-              value: {{ .Values.env.database__connection__database }}
+              value: {{ .Values.externalDatabase.user | quote }}
             - name: database__connection__password
-              valueFrom:
-                secretKeyRef:
-                  name: ghost-db-secrets
-                  key: root
+              value: {{ .Values.externalDatabase.password | quote }}
+            - name: database__connection__database
+              value: {{ .Values.externalDatabase.database | quote }}
+
+            # Storage: S3 (Якщо увімкнено)
+            {{- if .Values.storage.s3.enabled }}
+            - name: storage__active
+              value: "s3"
+            - name: storage__s3__endpoint
+              value: {{ .Values.storage.s3.endpoint | quote }}
+            - name: storage__s3__bucket
+              value: {{ .Values.storage.s3.bucket | quote }}
+            - name: storage__s3__region
+              value: {{ .Values.storage.s3.region | quote }}
+            - name: storage__s3__accessKeyId
+              value: {{ .Values.storage.s3.accessKey | quote }}
+            - name: storage__s3__secretAccessKey
+              value: {{ .Values.storage.s3.secretKey | quote }}
+            - name: storage__s3__forcePathStyle
+              value: "true" # Критично для MinIO
+            - name: storage__s3__signatureVersion
+              value: "v4"
+            {{- end }}
+
+          volumeMounts:
+            # Монтуємо контент (або диск, або пустишку для адаптера)
+            {{- if .Values.persistence.enabled }}
+            - name: ghost-content
+              mountPath: /var/lib/ghost/content
+            {{- end }}
+
+            # Монтуємо адаптер (якщо S3 увімкнено)
+            {{- if .Values.storage.s3.enabled }}
+            - name: s3-adapter-volume
+              mountPath: /var/lib/ghost/content/adapters/storage/s3
+            {{- end }}
+
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          volumeMounts:
-            - mountPath: /var/lib/ghost/content
-              name: ghost-data
-#      volumes:
-#        - name: ghost-data
-#          persistentVolumeClaim:
-#            claimName: ghost-pvc
+
+      volumes:
+        # Том для контенту (PVC)
+        {{- if .Values.persistence.enabled }}
+        - name: ghost-content
+          persistentVolumeClaim:
+            claimName: {{ include "ghost.fullname" . }}
+        {{- end }}
+
+        # Том для адаптера (спільний з init-контейнером)
+        {{- if .Values.storage.s3.enabled }}
+        - name: s3-adapter-volume
+          emptyDir: {}
+        {{- end }}
