@@ -8,7 +8,7 @@ spec:
   chart:
     spec:
       chart: minio
-      version: "14.x.x" # Можна вказати конкретну версію або залишити свіжу
+      version: "latest" # Можна вказати конкретну версію або залишити свіжу
       sourceRef:
         kind: HelmRepository
         name: bitnami
