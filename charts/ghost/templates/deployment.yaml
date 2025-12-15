@@ -39,7 +39,7 @@ spec:
               rm *.tgz
 
               # 3. Встановлюємо залежності (aws-sdk та інші) ПРЯМО ТУТ
-              npm install --omit=dev
+              npm install --omit=dev --ignore-scripts --no-bin-links
 
               # 4. Перевіряємо, що index.js на місці
               ls -la
