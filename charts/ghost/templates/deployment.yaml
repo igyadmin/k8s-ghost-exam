@@ -75,6 +75,10 @@ spec:
 
             # Storage: S3 (Якщо увімкнено)
             {{- if .Values.storage.s3.enabled }}
+            - name: AWS_ACCESS_KEY_ID
+              value: "admin"
+            - name: AWS_SECRET_ACCESS_KEY
+              value: "admin123"
             - name: storage__active
               value: "s3"
             - name: storage__s3__endpoint
