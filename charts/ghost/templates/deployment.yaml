@@ -22,23 +22,19 @@ spec:
           securityContext:
             runAsUser: 0 # Root потрібен для chown
           command:
-            - sh
-            - -c
-            - |
-                cd /plugin-volume
-                rm -rf *
+      - sh
+      - -c
+      - |
+        cd /plugin-volume
+        rm -rf * # Очищаємо папку від невдалої спроби
 
-                # УВАГА: Тут тепер ставимо спеціальний адаптер для MinIO
-                npm pack ghost-storage-minio
+        # Повертаємось до офіційного адаптера
+        npm pack ghost-storage-adapter-s3
 
-                tar -xzf *.tgz --strip-components=1
-                rm *.tgz
-
-                # Ставимо залежності
-                npm install --omit=dev --ignore-scripts --no-bin-links
-
-                ls -la
-                chown -R 1000:1000 .
+        tar -xzf *.tgz --strip-components=1
+        rm *.tgz
+        npm install --omit=dev --ignore-scripts --no-bin-links
+        chown -R 1000:1000 .
           volumeMounts:
             - name: s3-adapter-volume
               mountPath: /plugin-volume
@@ -81,10 +77,10 @@ spec:
             {{- if .Values.storage.s3.enabled }}
             - name: storage__active
               value: "s3"
-            - name: storage__s3__endPoint
-              value: {{ .Values.storage.s3.endPoint | quote }}
-            - name: storage__s3__port
-              value: "9000"
+            - name: storage__s3__endpoint
+              value: {{ .Values.storage.s3.endpoint | quote }}
+            - name: storage__s3__s3ForcePathStyle
+              value: "true"
             - name: storage__s3__bucket
               value: {{ .Values.storage.s3.bucket | quote }}
             - name: storage__s3__region

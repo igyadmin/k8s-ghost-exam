@@ -47,7 +47,7 @@ storage:
   s3:
     enabled: false
     region: "us-east-1"
-    endPoint: "minio.minio.svc.k8s.com822.dom"
+    endpoint: "http://minio.minio.svc.k8s.com822.dom:9000"
     bucket: "ghost-bucket"
     accessKey: "admin"
     secretKey: "admin123"
