@@ -93,9 +93,9 @@ spec:
               value: {{ .Values.storage.s3.bucket | quote }}
             - name: storage__s3__region
               value: {{ .Values.storage.s3.region | quote }}
-            - name: storage__s3__accessKeyId
+            - name: storage__s3__accessKey
               value: {{ .Values.storage.s3.accessKey | quote }}
-            - name: storage__s3__secretAccessKey
+            - name: storage__s3__secretKey
               value: {{ .Values.storage.s3.secretKey | quote }}
             - name: storage__s3__forcePathStyle
               value: "true" # Критично для MinIO
