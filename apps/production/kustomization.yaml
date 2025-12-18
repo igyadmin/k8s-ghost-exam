@@ -43,7 +43,7 @@ patches:
           storage:
             s3:
               enabled: true
-              endpoint: "http://minio.infrastructure.svc.k8s.com822.dom:9000"
+              endpoint: "http://minio.infrastructure.svc.cluster.local:9000"
               bucket: "ghost-bucket"
               region: "us-east-1" # Стандарт для MinIO
               accessKey: "admin"
@@ -52,7 +52,7 @@ patches:
           # --- БАЗА ДАНИХ (MariaDB) ---
           externalDatabase:
             client: mysql
-            host: mariadb.infrastructure.svc.k8s.com822.dom
+            host: mariadb.infrastructure.svc.cluster.local
             port: 3306
             user: ghost
             password: ghost_password
