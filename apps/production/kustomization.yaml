@@ -17,7 +17,7 @@ patches:
         name: ghost
       spec:
         # Інтервал звірки (можна збільшити для проду)
-        interval: 1h
+        interval: 2m
         values:
           # --- ГОЛОВНІ НАЛАШТУВАННЯ ---
           url: "http://ghost.k8s.com822.dom"
