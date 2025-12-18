@@ -46,8 +46,8 @@ patches:
               endpoint: "http://minio.minio.svc.k8s.com822.dom:9000"
               bucket: "ghost-bucket"
               region: "us-east-1" # Стандарт для MinIO
-              accessKey: "admin"
-              secretKey: "admin123" # Перевір, чи тут актуальний пароль
+              accessKeyID: "admin"
+              secretAccessKey: "admin123" # Перевір, чи тут актуальний пароль
               forcePathStyle: true
           # --- БАЗА ДАНИХ (MariaDB) ---
           externalDatabase:
