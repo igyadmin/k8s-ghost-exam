@@ -22,19 +22,19 @@ spec:
           securityContext:
             runAsUser: 0 # Root потрібен для chown
           command:
-      - sh
-      - -c
-      - |
-        cd /plugin-volume
-        rm -rf *
+            - sh
+            - -c
+            - |
+              cd /plugin-volume
+              rm -rf *
 
-        # Повертаємось до офіційного адаптера
-        npm pack ghost-storage-adapter-s3
+              # Повертаємось до офіційного адаптера
+              npm pack ghost-storage-adapter-s3
 
-        tar -xzf *.tgz --strip-components=1
-        rm *.tgz
-        npm install --omit=dev --ignore-scripts --no-bin-links
-        chown -R 1000:1000 .
+              tar -xzf *.tgz --strip-components=1
+              rm *.tgz
+              npm install --omit=dev --ignore-scripts --no-bin-links
+              chown -R 1000:1000 .
           volumeMounts:
             - name: s3-adapter-volume
               mountPath: /plugin-volume
