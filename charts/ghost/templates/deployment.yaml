@@ -102,6 +102,9 @@ spec:
             {{- end }}
 
           volumeMounts:
+            - name: ghost-config-vol
+              mountPath: /var/lib/ghost/config.production.json
+              subPath: config.production.json
             # Монтуємо контент (або диск, або пустишку для адаптера)
             {{- if .Values.persistence.enabled }}
             - name: ghost-content

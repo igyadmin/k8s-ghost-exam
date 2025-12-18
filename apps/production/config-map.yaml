@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ghost-config-json
+data:
+  config.production.json: |
+    {
+      "url": "http://ghost.k8s.com822.dom",
+      "server": {
+        "port": 2368,
+        "host": "0.0.0.0"
+      },
+      "logging": {
+        "level": "info",
+        "transports": ["stdout"]
+      },
+      "process": "systemd",
+      "paths": {
+        "contentPath": "/var/lib/ghost/content"
+      },
+      "storage": {
+        "active": "s3",
+        "s3": {
+          "accessKeyId": "admin",
+          "secretAccessKey": "admin123",
+          "bucket": "ghost-bucket",
+          "region": "us-east-1",
+          "endpoint": "http://minio.minio.svc.k8s.com822.dom:9000",
+          "s3ForcePathStyle": true,
+          "signatureVersion": "v4"
+        }
+      }
+    }
