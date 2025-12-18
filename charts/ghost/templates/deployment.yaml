@@ -26,7 +26,7 @@ spec:
       - -c
       - |
         cd /plugin-volume
-        rm -rf * # Очищаємо папку від невдалої спроби
+        rm -rf *
 
         # Повертаємось до офіційного адаптера
         npm pack ghost-storage-adapter-s3
