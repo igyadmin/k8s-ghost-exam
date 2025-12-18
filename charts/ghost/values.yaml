@@ -51,3 +51,4 @@ storage:
     bucket: "ghost-bucket"
     accessKey: "admin"
     secretKey: "admin123"
+    forcePathStyle: true

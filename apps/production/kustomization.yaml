@@ -43,7 +43,7 @@ patches:
           storage:
             s3:
               enabled: true
-              endpoint: "http://minio.minio.svc.k8s.com822.dom:9000"
+              endpoint: "http://minio.minio.svc.cluster.local:9000"
               bucket: "ghost-bucket"
               region: "us-east-1" # Стандарт для MinIO
               accessKey: "admin"
