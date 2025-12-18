@@ -52,7 +52,7 @@ patches:
           # --- БАЗА ДАНИХ (MariaDB) ---
           externalDatabase:
             client: mysql
-            host: mariadb.infrastructure.svc.cluster.local
+            host: mariadb.infrastructure.svc.k8s.com822.dom
             port: 3306
             user: ghost
             password: ghost_password
