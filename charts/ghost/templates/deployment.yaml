@@ -64,6 +64,12 @@ spec:
 
           # --- ЗМІННІ СЕРЕДОВИЩА (Налаштування) ---
           env:
+            - name: AWS_ACCESS_KEY_ID
+              value: "admin"
+            - name: AWS_SECRET_ACCESS_KEY
+              value: "admin123"
+
+
             - name: url
               value: {{ .Values.url | quote }}
             - name: NODE_ENV
