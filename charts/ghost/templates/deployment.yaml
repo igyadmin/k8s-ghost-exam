@@ -121,7 +121,11 @@ spec:
             {{- toYaml .Values.resources | nindent 12 }}
 
       volumes:
-        # Том для контенту (PVC)
+        - name: ghost-config-vol
+          configMap:
+            name: ghost-config-json
+
+     # Том для контенту (PVC)
         {{- if .Values.persistence.enabled }}
         - name: ghost-content
           persistentVolumeClaim:
