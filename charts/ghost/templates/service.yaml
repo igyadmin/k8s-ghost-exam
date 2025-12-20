@@ -9,4 +9,5 @@ spec:
       targetPort: 2368
       protocol: TCP
   selector:
-    app: ghost
+    app.kubernetes.io/name: ghost-exam
+    app.kubernetes.io/instance: ghost
