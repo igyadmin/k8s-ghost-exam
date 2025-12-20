@@ -99,8 +99,6 @@ spec:
                   name: ghost-aws-secrets
                   key: secret-key
   # Це корисно залишити, щоб Sharp не "їв" пам'ять
-            - name: imageOptimization__resize
-              value: "false"
             - name: AWS_ACCESS_KEY_ID        # <--- Стандартна назва
               valueFrom:
                 secretKeyRef:
@@ -110,8 +108,8 @@ spec:
             - name: AWS_SECRET_ACCESS_KEY    # <--- Стандартна назва
               valueFrom:
                 secretKeyRef:
-                name: ghost-aws-secrets
-                key: secret-key
+                  name: ghost-aws-secrets
+                  key: secret-key
 
             - name: AWS_DEFAULT_REGION       # <--- Стандартна назва
               value: "eu-north-1"
