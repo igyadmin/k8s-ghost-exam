@@ -75,30 +75,40 @@ spec:
             - name: database__connection__database
               value: {{ .Values.externalDatabase.database | quote }}
 
+  # === AWS S3 CONFIG ===
+            - name: storage__active
+              value: "s3"
+  
+  # Регіон, який ви обрали при створенні бакета (напр. eu-central-1)
+            - name: storage__s3__region
+              value: "eu-north-1"
 
-          volumeMounts:
-            - name: ghost-config-vol
-              mountPath: /var/lib/ghost/config.production.json
-              subPath: config.production.json
-            # Монтуємо контент (або диск, або пустишку для адаптера)
-            {{- if .Values.persistence.enabled }}
-            - name: ghost-content
-              mountPath: /var/lib/ghost/content
-            {{- end }}
+  # Точне ім'я бакета
+            - name: storage__s3__bucket
+              value: "ghost-exam-baket"
 
-            # Монтуємо адаптер (якщо S3 увімкнено)
-            {{- if .Values.storage.s3.enabled }}
-            - name: s3-adapter-volume
-              mountPath: /var/lib/ghost/content/adapters/storage/s3
-            {{- end }}
+  # Ключі, які ви отримали в IAM (Step 3)
+            - name: storage__s3__accessKey
+              valueFrom:
+                secretKeyRef:
+                  name: ghost-aws-secrets
+                  key: access-key
+            - name: storage__s3__secretKey
+              valueFrom:
+                secretKeyRef:
+                  name: ghost-aws-secrets
+                  key: secret-key
+  # Це корисно залишити, щоб Sharp не "їв" пам'ять
+            - name: imageOptimization__resize
+              value: "false"
 
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-
+          volumeMounts:
+            - name: s3-adapter-volume
+              # Цей шлях критично важливий, він каже Ghost'у, де лежить "драйвер"
+              mountPath: /var/lib/ghost/content/adapters/storage/s3
       volumes:
-        - name: ghost-config-vol
-          configMap:
-            name: ghost-config-json
 
      # Том для контенту (PVC)
         {{- if .Values.persistence.enabled }}
