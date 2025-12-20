@@ -21,4 +21,4 @@ spec:
               service:
                 name: ghost  # <--- ПЕРЕВІРТЕ ЦЕ ІМ'Я (результат kubectl get svc)
                 port:
-                  number: 2368
+                  number: 80
