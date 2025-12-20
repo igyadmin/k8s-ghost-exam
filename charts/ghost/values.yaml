@@ -46,9 +46,6 @@ persistence:
 storage:
   s3:
     enabled: false
-    region: "us-east-1"
+    region: "us-north-1"
     endpoint: "http://minio.minio.svc.k8s.com822.dom:9000"
-    bucket: "ghost-bucket"
-    accessKey: "admin"
-    secretKey: "admin123"
-    forcePathStyle: true
+    bucket: "ghost-exam-bucket"
