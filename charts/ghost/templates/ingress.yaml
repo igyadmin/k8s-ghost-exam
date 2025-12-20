@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ghost-ingress
+  annotations:
+    # Вказуємо клас контролера (зазвичай це nginx)
+    kubernetes.io/ingress.class: nginx
+    
+    # КРИТИЧНО ВАЖЛИВО для блогу:
+    # Збільшуємо ліміт розміру тіла запиту, інакше при завантаженні
+    # великої картинки Nginx видасть помилку "413 Request Entity Too Large"
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+spec:
+  rules:
+    - host: ghost.k8s.com822.dom
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ghost  # <--- ПЕРЕВІРТЕ ЦЕ ІМ'Я (результат kubectl get svc)
+                port:
+                  number: 2368
