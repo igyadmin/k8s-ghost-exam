@@ -88,12 +88,12 @@ spec:
               value: "ghost-exam-baket"
 
   # Ключі, які ви отримали в IAM (Step 3)
-            - name: storage__s3__accessKey
+            - name: storage__s3__accessKeyID
               valueFrom:
                 secretKeyRef:
                   name: ghost-aws-secrets
                   key: access-key
-            - name: storage__s3__secretKey
+            - name: storage__s3__secretAccessKey
               valueFrom:
                 secretKeyRef:
                   name: ghost-aws-secrets
