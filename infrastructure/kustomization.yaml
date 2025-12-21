@@ -1,7 +1,8 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - controllers/namespace.yaml
+  - namespaces/infrastructure.yaml
   - configs/bitnami-repo.yaml
   - namespaces/production.yaml
   - namespaces/staging.yaml
+  - controllers/mariadb.yaml
