@@ -113,6 +113,12 @@ spec:
 
             - name: AWS_DEFAULT_REGION       # <--- Стандартна назва
               value: "eu-north-1"
+
+            - name: mail__transport
+              value: "stream"
+
+            - name: mail__options__stream
+              value: "stdout"
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
