@@ -72,3 +72,27 @@ adapter:
   image: node:18-alpine
   installCommand: "mkdir -p /tmp/s3-adapter && cd /tmp/s3-adapter && npm install ghost-storage-adapter-s3"
   path: "/var/lib/ghost/content/adapters/storage/s3"
+
+secrets:
+  # База даних (Створюється всюди)
+  db:
+    create: true
+    name: ghost-db-secrets
+    values:
+      root: ""
+      password: ""
+
+  # Пошта (Створюється всюди, Ethereal)
+  mail:
+    create: true
+    name: ghost-mail-secret
+    values:
+      password: "" # <--- Впишіть сюди ваш пароль від Ethereal один раз
+
+  # S3 (Тільки Prod, тому тут false)
+  s3:
+    create: false
+    name: ghost-aws-secrets
+    values:
+      accessKey: ""
+      secretKey: ""
