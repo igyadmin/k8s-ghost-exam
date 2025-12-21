@@ -115,10 +115,14 @@ spec:
               value: "eu-north-1"
 
             - name: mail__transport
-              value: "stream"
+              value: "SMTP"
 
-            - name: mail__options__stream
-              value: "stdout"
+            - name: mail__options__host
+              value: "127.0.0.1"  # Стукаємо самі до себе
+
+            - name: mail__options__port
+              value: "25"
+
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
