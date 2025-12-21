@@ -14,8 +14,12 @@ spec:
         name: bitnami
         namespace: flux-system
       interval: 1h0m0s
+
   values:
-    # Важливо! Це змушує сервіс називатися просто "mariadb"
+    image:
+      tag: latest  # <--- Вказуємо latest, щоб уникнути помилки "not found"
+      pullPolicy: Always
+ # Важливо! Це змушує сервіс називатися просто "mariadb"
     fullnameOverride: mariadb
 
     # Налаштування користувачів для офіційного чарту
@@ -50,6 +54,9 @@ spec:
         namespace: flux-system
       interval: 1h0m0s
   values:
+    image:
+      tag: latest  # <--- Вказуємо latest, щоб уникнути помилки "not found"
+      pullPolicy: Always
     fullnameOverride: mariadb
     auth:
       # ВАЖЛИВО: Тут мають бути ті самі паролі, які ви задали
