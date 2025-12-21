@@ -64,5 +64,5 @@ storage:
 adapter:
   enabled: true
   image: node:18-alpine
-  installCommand: "npm install ghost-storage-adapter-s3"
+  installCommand: "mkdir -p /tmp/s3-adapter && cd /tmp/s3-adapter && npm install ghost-storage-adapter-s3"
   path: "/var/lib/ghost/content/adapters/storage/s3"
