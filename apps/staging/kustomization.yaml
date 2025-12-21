@@ -3,6 +3,8 @@ kind: Kustomization
 resources:
   - ../base/ghost
   - namespace.yaml
+  # Не забудьте додати файл створення бази для staging, якщо він є окремим файлом
+  # - mariadb-staging.yaml
 namespace: staging
 
 patches:
@@ -10,25 +12,17 @@ patches:
       kind: HelmRelease
       name: ghost
     patch: |-
-      apiVersion: helm.toolkit.fluxcd.io/v2
+      apiVersion: helm.toolkit.fluxcd.io/v2beta1
       kind: HelmRelease
       metadata:
         name: ghost
       spec:
         values:
-          resources:
-            requests:
-              cpu: 50m
-              memory: 256Mi
-            limits:
-              cpu: 200m
-              memory: 512Mi
-          ghostHost: ghost-staging.k8s.com822.dom
-          ghostProtocol: http
-
+          url: "http://ghost-staging.k8s.com822.dom"
           ingress:
             enabled: true
-            ingressClassName: nginx
-            hostname: ghost-staging.k8s.com822.dom
-            path: /
-
+            hosts:
+              - host: ghost-staging.k8s.com822.dom
+                paths:
+                  - path: /
+                    pathType: Prefix

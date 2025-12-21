@@ -1,9 +1,11 @@
+# charts/ghost/values.yaml
+
 replicaCount: 1
 
 image:
   repository: ghost
-  pullPolicy: IfNotPresent
   tag: "5.130.5-alpine"
+  pullPolicy: IfNotPresent
 
 service:
   type: ClusterIP
@@ -12,12 +14,6 @@ service:
 
 ingress:
   enabled: false
-  className: ""
-  hosts:
-    - host: chart-example.local
-      paths:
-        - path: /
-          pathType: ImplementationSpecific
 
 resources:
   requests:
@@ -29,22 +25,44 @@ resources:
 
 url: "http://localhost"
 
+# --- БАЗА ДАНИХ (Локальна для кожного середовища) ---
 externalDatabase:
   client: mysql
-  host: mariadb.infrastructure.svc.k8s.com822.dom
+  host: mariadb  # Ім'я сервісу в поточному namespace (staging або production)
   port: 3306
-  user: ghost
-  password: ghost_password
-  database: ghost_db
+  user: root
+  database: ghost
+  # Пароль береться з секрету
 
-persistence:
-  enabled: true
-  storageClass: ""
-  size: 5Gi
-  path: /var/lib/ghost/content
+# --- ПОШТА (Ethereal за замовчуванням) ---
+mail:
+  transport: "SMTP"
+  options:
+    host: "smtp.ethereal.email"
+    port: 587
+    service: "" # Для Ethereal сервіс не вказуємо
+    auth:
+      user: "" # Перевизначимо в release.yaml або секретах
+      pass: ""
 
+# --- СХОВИЩЕ ТА АДАПТЕР ---
 storage:
+  active: "Local" # "Local" або "s3"
+
+  # Налаштування S3 (використовуються, якщо active: s3)
   s3:
-    enabled: false
-    region: "us-north-1"
-    bucket: "ghost-exam-bucket"
+    region: "eu-north-1"
+    bucket: "ghost-exam-baket"
+
+  # Локальний диск (для контенту)
+  pvc:
+    enabled: true
+    size: 2Gi
+    path: /var/lib/ghost/content
+
+# --- INIT CONTAINER (Збірка адаптера) ---
+adapter:
+  enabled: true
+  image: node:18-alpine
+  installCommand: "npm install ghost-storage-adapter-s3"
+  path: "/var/lib/ghost/content/adapters/storage/s3"
