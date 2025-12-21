@@ -1,13 +1,17 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Release.Name }}
+  # Використовуємо fullname, щоб співпадало з тим, що шукає Ingress
+  name: {{ include "ghost.fullname" . }}
+  labels:
+    {{- include "ghost.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
   ports:
     - port: {{ .Values.service.port }}
       targetPort: 2368
       protocol: TCP
+      name: http
   selector:
-    app.kubernetes.io/name: ghost-exam
-    app.kubernetes.io/instance: ghost
+    # Використовуємо той самий шаблон селектора, що і в Deployment
+    {{- include "ghost.selectorLabels" . | nindent 4 }}
