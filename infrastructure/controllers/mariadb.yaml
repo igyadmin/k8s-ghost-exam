@@ -1,13 +1,3 @@
----
-apiVersion: source.toolkit.fluxcd.io/v1beta2
-kind: HelmRepository
-metadata:
-  name: mariadb-official
-  namespace: flux-system
-spec:
-  interval: 1h0m0s
-  url: https://mariadb.github.io/helm-charts
----
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -18,10 +8,10 @@ spec:
   chart:
     spec:
       chart: mariadb
-      version: 11.4.1 # Використовуємо актуальну версію
+      version: 19.1.0  # Актуальна версія Bitnami
       sourceRef:
         kind: HelmRepository
-        name: mariadb-official
+        name: bitnami
         namespace: flux-system
       interval: 1h0m0s
   values:
@@ -47,17 +37,18 @@ apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: mariadb
-  namespace: production  # <--- Ключова зміна
+  namespace: production
 spec:
   interval: 1h0m0s
   chart:
     spec:
       chart: mariadb
-      version: 11.4.1
+      version: 19.1.0  # Актуальна версія Bitnami
       sourceRef:
         kind: HelmRepository
-        name: mariadb-official
+        name: bitnami
         namespace: flux-system
+      interval: 1h0m0s
   values:
     fullnameOverride: mariadb
     auth:
