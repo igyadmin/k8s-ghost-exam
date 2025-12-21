@@ -1,0 +1,43 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: HelmRepository
+metadata:
+  name: mariadb-official
+  namespace: flux-system
+spec:
+  interval: 1h0m0s
+  url: https://mariadb.github.io/helm-charts
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: mariadb
+  namespace: staging
+spec:
+  interval: 1h0m0s
+  chart:
+    spec:
+      chart: mariadb
+      version: 11.4.1 # Використовуємо актуальну версію
+      sourceRef:
+        kind: HelmRepository
+        name: mariadb-official
+        namespace: flux-system
+      interval: 1h0m0s
+  values:
+    # Важливо! Це змушує сервіс називатися просто "mariadb"
+    fullnameOverride: mariadb
+
+    # Налаштування користувачів для офіційного чарту
+    auth:
+      rootPassword: "verySecretRootPass123!"
+      database: "ghost"
+      username: "ghost"
+      password: "VerySecretUserPass123!"
+
+    # Параметри диска
+    primary:
+      persistence:
+        enabled: true
+        size: 2Gi
+        # storageClass: "standard" # Розкоментуйте, якщо диск не створюється сам
