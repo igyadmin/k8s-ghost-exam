@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
   - namespaces/infrastructure.yaml
   - configs/bitnami-repo.yaml
+  - configs/mariadb-repo.conf
   - namespaces/production.yaml
   - namespaces/staging.yaml
   - controllers/mariadb.yaml
