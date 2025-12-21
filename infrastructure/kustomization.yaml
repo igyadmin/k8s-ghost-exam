@@ -3,3 +3,5 @@ kind: Kustomization
 resources:
   - controllers/namespace.yaml
   - configs/bitnami-repo.yaml
+  - namespaces/production.yaml
+  - namespaces/staging.yaml
