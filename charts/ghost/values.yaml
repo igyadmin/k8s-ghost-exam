@@ -13,7 +13,13 @@ service:
   targetPort: 2368
 
 ingress:
-  enabled: false
+  enabled: false          # <--- За замовчуванням ВИМКНЕНО. Це безпечно.
+  className: "nginx"
+  hosts:
+    - host: ghost.local   # <--- Нейтральний хост-заглушка
+      paths:
+        - path: /
+          pathType: Prefix
 
 resources:
   requests:

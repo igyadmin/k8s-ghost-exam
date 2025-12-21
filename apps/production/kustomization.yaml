@@ -37,16 +37,6 @@ patches:
               region: "eu-central-1"
               bucket: "ghost-exam-images-2025"
 
-          # Налаштування пошти (Gmail / Ethereal)
-          mail:
-            transport: "SMTP"
-            options:
-              service: "Gmail"
-              auth:
-                user: "ваша.пошта@gmail.com"
-              # Пароль підтягнеться через env (secretKeyRef) у deployment.yaml,
-              # але тут треба вказати, що auth увімкнено.
-
           ingress:
             enabled: true
             hosts:
