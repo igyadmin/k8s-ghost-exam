@@ -6,54 +6,51 @@ resources:
   - hpa.yaml
 namespace: production
 
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../base/ghost
+  - namespace.yaml
+  - hpa.yaml
+namespace: production
+
 patches:
   - target:
       kind: HelmRelease
       name: ghost
     patch: |-
-      apiVersion: helm.toolkit.fluxcd.io/v2
+      apiVersion: helm.toolkit.fluxcd.io/v2beta1
       kind: HelmRelease
       metadata:
         name: ghost
       spec:
-        # Інтервал звірки (можна збільшити для проду)
-        interval: 1h
         values:
-          # --- ГОЛОВНІ НАЛАШТУВАННЯ ---
           url: "http://ghost.k8s.com822.dom"
 
-          # Керування репліками віддаємо HPA
-          replicaCount: null
+          # Вмикаємо 2 репліки
+          replicaCount: 2
 
-          # Ресурси для Production
-          resources:
-            requests:
-              cpu: 100m
-              memory: 256Mi
-            limits:
-              cpu: 500m
-              memory: 512Mi
-
-          # --- СХОВИЩЕ ---
-          # Вимикаємо локальний PVC (важливо, щоб Helm не створив диск)
-          persistence:
-            enabled: false
-
-          # Вмикаємо S3 (Чарт сам додасть плагін та змінні середовища)
+          # Перемикаємося на S3 (AWS)
           storage:
+            active: "s3"
             s3:
-              enabled: true
-              endpoint: "http://minio.minio.svc.k8s.com822.dom:9000"
-              bucket: "ghost-bucket"
-              region: "us-east-1" # Стандарт для MinIO
-              accessKey: "admin"
-              secretKey: "admin123" # Перевір, чи тут актуальний пароль
-              forcePathStyle: true
-          # --- БАЗА ДАНИХ (MariaDB) ---
-          externalDatabase:
-            client: mysql
-            host: mariadb.infrastructure.svc.k8s.com822.dom
-            port: 3306
-            user: ghost
-            password: ghost_password
-            database: ghost_db
+              region: "eu-central-1"
+              bucket: "ghost-exam-images-2025"
+
+          # Налаштування пошти (Gmail / Ethereal)
+          mail:
+            transport: "SMTP"
+            options:
+              service: "Gmail"
+              auth:
+                user: "ваша.пошта@gmail.com"
+              # Пароль підтягнеться через env (secretKeyRef) у deployment.yaml,
+              # але тут треба вказати, що auth увімкнено.
+
+          ingress:
+            enabled: true
+            hosts:
+              - host: ghost.k8s.com822.dom
+                paths:
+                  - path: /
+                    pathType: Prefix

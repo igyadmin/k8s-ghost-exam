@@ -14,54 +14,42 @@ spec:
       labels:
         {{- include "ghost.selectorLabels" . | nindent 8 }}
     spec:
-      # --- INIT CONTAINER (Тільки якщо S3 увімкнено) ---
-      {{- if .Values.storage.s3.enabled }}
+      # --- INIT CONTAINER (Збірка адаптера S3) ---
+      # Запускається ТІЛЬКИ якщо ми обрали S3 в налаштуваннях
+      {{- if eq .Values.storage.active "s3" }}
       initContainers:
         - name: install-s3-adapter
-          image: node:18-slim
-          securityContext:
-            runAsUser: 0 # Root потрібен для chown
+          image: {{ .Values.adapter.image }}
           command:
             - sh
             - -c
             - |
-              cd /plugin-volume
-              rm -rf *
-
-              # Повертаємось до офіційного адаптера
-              npm pack ghost-storage-adapter-s3
-
-              tar -xzf *.tgz --strip-components=1
-              rm *.tgz
-              npm install --omit=dev --ignore-scripts --no-bin-links
-              chown -R 1000:1000 .
+              {{ .Values.adapter.installCommand }}
+              # Копіюємо з поточної папки (де npm install створив node_modules) у спільний том
+              mkdir -p {{ .Values.adapter.path }}
+              cp -r node_modules/ghost-storage-adapter-s3/* {{ .Values.adapter.path }}/
           volumeMounts:
             - name: s3-adapter-volume
-              mountPath: /plugin-volume
+              mountPath: /var/lib/ghost/content/adapters
       {{- end }}
-
 
       containers:
         - name: {{ .Chart.Name }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-
           ports:
             - name: http
               containerPort: 2368
               protocol: TCP
 
-          # --- ЗМІННІ СЕРЕДОВИЩА (Налаштування) ---
+          # --- ЗМІННІ СЕРЕДОВИЩА ---
           env:
-
             - name: url
               value: {{ .Values.url | quote }}
             - name: NODE_ENV
               value: production
-            - name: imageOptimization__resize
-              value: "false"
 
-    # База Даних (MariaDB)
+            # --- БАЗА ДАНИХ (Беремо з values.yaml) ---
             - name: database__client
               value: {{ .Values.externalDatabase.client | quote }}
             - name: database__connection__host
@@ -70,80 +58,81 @@ spec:
               value: {{ .Values.externalDatabase.port | quote }}
             - name: database__connection__user
               value: {{ .Values.externalDatabase.user | quote }}
-            - name: database__connection__password
-              value: {{ .Values.externalDatabase.password | quote }}
             - name: database__connection__database
               value: {{ .Values.externalDatabase.database | quote }}
-
-  # === AWS S3 CONFIG ===
-            - name: storage__active
-              value: "s3"
-  
-  # Регіон, який ви обрали при створенні бакета (напр. eu-central-1)
-            - name: storage__s3__region
-              value: "eu-north-1"
-
-  # Точне ім'я бакета
-            - name: storage__s3__bucket
-              value: "ghost-exam-baket"
-
-  # Ключі, які ви отримали в IAM (Step 3)
-            - name: storage__s3__accessKeyID
+            # Пароль беремо з секрету (ім'я секрету має бути стандартним: mysql-pass)
+            - name: database__connection__password
               valueFrom:
                 secretKeyRef:
-                  name: ghost-aws-secrets
-                  key: access-key
-            - name: storage__s3__secretAccessKey
-              valueFrom:
-                secretKeyRef:
-                  name: ghost-aws-secrets
-                  key: secret-key
-  # Це корисно залишити, щоб Sharp не "їв" пам'ять
-            - name: AWS_ACCESS_KEY_ID        # <--- Стандартна назва
-              valueFrom:
-                secretKeyRef:
-                  name: ghost-aws-secrets
-                  key: access-key
+                  name: mysql-pass
+                  key: password
 
-            - name: AWS_SECRET_ACCESS_KEY    # <--- Стандартна назва
-              valueFrom:
-                secretKeyRef:
-                  name: ghost-aws-secrets
-                  key: secret-key
-
-            - name: AWS_DEFAULT_REGION       # <--- Стандартна назва
-              value: "eu-north-1"
-
+            # --- ПОШТА (Беремо з values.yaml) ---
             - name: mail__transport
-              value: "SMTP"
+              value: {{ .Values.mail.transport | quote }}
             - name: mail__options__host
-              value: "smtp.ethereal.email"
+              value: {{ .Values.mail.options.host | quote }}
             - name: mail__options__port
-              value: "587"
+              value: {{ .Values.mail.options.port | quote }}
+            # Авторизація пошти (якщо є)
+            {{- if .Values.mail.options.auth.user }}
             - name: mail__options__auth__user
-              value: "waino.kihn@ethereal.email"
+              value: {{ .Values.mail.options.auth.user | quote }}
+            {{- end }}
+            {{- if .Values.mail.options.auth.pass }}
             - name: mail__options__auth__pass
               valueFrom:
                 secretKeyRef:
-                  name: ethereal-mail-secret
+                  name: ghost-mail-secret
                   key: mail-pass
-          resources:
-            {{- toYaml .Values.resources | nindent 12 }}
-          volumeMounts:
-            - name: s3-adapter-volume
-              # Цей шлях критично важливий, він каже Ghost'у, де лежить "драйвер"
-              mountPath: /var/lib/ghost/content/adapters/storage/s3
-      volumes:
+            {{- end }}
 
-     # Том для контенту (PVC)
-        {{- if .Values.persistence.enabled }}
+            # --- S3 CONFIG (Тільки якщо active == s3) ---
+            {{- if eq .Values.storage.active "s3" }}
+            - name: storage__active
+              value: "s3"
+            - name: storage__s3__region
+              value: {{ .Values.storage.s3.region | quote }}
+            - name: storage__s3__bucket
+              value: {{ .Values.storage.s3.bucket | quote }}
+            # Ключі AWS (глобальні змінні)
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: ghost-aws-secrets
+                  key: access-key
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: ghost-aws-secrets
+                  key: secret-key
+            - name: AWS_DEFAULT_REGION
+              value: {{ .Values.storage.s3.region | quote }}
+            {{- end }}
+
+          volumeMounts:
+            # Монтуємо локальний диск (якщо Local)
+            {{- if eq .Values.storage.active "Local" }}
+            - name: ghost-content
+              mountPath: {{ .Values.storage.pvc.path }}
+            {{- end }}
+
+            # Монтуємо адаптер (якщо S3)
+            {{- if eq .Values.storage.active "s3" }}
+            - name: s3-adapter-volume
+              mountPath: /var/lib/ghost/content/adapters
+            {{- end }}
+
+      volumes:
+        # Том для локального контенту
+        {{- if eq .Values.storage.active "Local" }}
         - name: ghost-content
           persistentVolumeClaim:
             claimName: {{ include "ghost.fullname" . }}
         {{- end }}
 
-        # Том для адаптера (спільний з init-контейнером)
-        {{- if .Values.storage.s3.enabled }}
+        # Том для адаптера (спільний)
+        {{- if eq .Values.storage.active "s3" }}
         - name: s3-adapter-volume
           emptyDir: {}
         {{- end }}
