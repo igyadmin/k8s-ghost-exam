@@ -17,7 +17,18 @@ patches:
       metadata:
         name: ghost
       spec:
+        valuesFrom:
+          - kind: Secret
+            name: ghost-values-override
+            valuesKey: values.yaml
         values:
+          secrets:
+            db:
+              create: true
+            mail:
+              create: true
+
+
           url: "http://ghost-staging.k8s.com822.dom"
           ingress:
             enabled: true

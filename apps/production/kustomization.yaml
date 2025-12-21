@@ -24,10 +24,14 @@ patches:
       metadata:
         name: ghost
       spec:
+        valuesFrom:
+          - kind: Secret
+            name: ghost-values-override
+            valuesKey: values.yaml
         values:
           url: "http://ghost.k8s.com822.dom"
 
-          # Вмикаємо 2 репліки
+
           replicaCount: 2
 
           # Перемикаємося на S3 (AWS)
@@ -36,6 +40,13 @@ patches:
             s3:
               region: "eu-central-1"
               bucket: "ghost-exam-images-2025"
+          secrets:
+            s3:
+              create: true
+            db:
+              create: true
+            mail:
+              create: true
 
           ingress:
             enabled: true
