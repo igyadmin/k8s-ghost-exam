@@ -115,8 +115,18 @@ spec:
               value: "eu-north-1"
 
             - name: mail__transport
-              value: "json"
-
+              value: "SMTP"
+            - name: mail__options__host
+              value: "smtp.ethereal.email"
+            - name: mail__options__port
+              value: "587"
+            - name: mail__options__auth__user
+              value: "waino.kihn@ethereal.email"
+            - name: mail__options__auth__pass
+              valueFrom:
+                secretKeyRef:
+                  name: ethereal-mail-secret
+                  key: mail-pass
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
