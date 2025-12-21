@@ -64,7 +64,7 @@ spec:
             - name: database__connection__password
               valueFrom:
                 secretKeyRef:
-                  name: mysql-pass
+                  name: ghost-db-secrets
                   key: password
 
             # --- ПОШТА (Беремо з values.yaml) ---
