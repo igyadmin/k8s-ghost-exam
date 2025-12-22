@@ -24,14 +24,16 @@ spec:
             - sh
             - -c
             - |
-              {{ .Values.adapter.installCommand }}
-              # Копіюємо з поточної папки (де npm install створив node_modules) у спільний том
-              mkdir -p {{ .Values.adapter.path }}
-              cp -r node_modules/ghost-storage-adapter-s3/* {{ .Values.adapter.path }}/
+              cd /plugin-volume
+              rm -rf *
+              npm pack ghost-storage-adapter-s3
+              tar -xzf *.tgz --strip-components=1
+              rm *.tgz
+              npm install --omit=dev --ignore-scripts --no-bin-links
+              chown -R 1000:1000 .
           volumeMounts:
-            - name: s3-adapter-volume
+            - name: s3-adapter-volume  # <--- Ваша назва
               mountPath: /plugin-volume
-      {{- end }}
 
       containers:
         - name: {{ .Chart.Name }}
@@ -119,8 +121,8 @@ spec:
 
             # Монтуємо адаптер (якщо S3)
             {{- if eq .Values.storage.active "s3" }}
-            - name: s3-adapter-volume
-              mountPath: /plugin-volume
+            - name: s3-adapter-volume  # <--- Додайте це
+              mountPath: /var/lib/ghost/content/adapters/storage/s3          
             {{- end }}
 
       volumes:
