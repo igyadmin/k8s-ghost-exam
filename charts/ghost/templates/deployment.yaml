@@ -34,7 +34,7 @@ spec:
           volumeMounts:
             - name: s3-adapter-volume  # <--- Ваша назва
               mountPath: /plugin-volume
-
+      {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
