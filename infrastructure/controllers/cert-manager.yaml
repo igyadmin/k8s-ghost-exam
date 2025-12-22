@@ -27,3 +27,7 @@ spec:
     installCRDs: true # Обов'язково true, щоб встановити Custom Resources
     startupapicheck:
       enabled: false
+    webhook:
+      hostNetwork: true
+      # Обов'язково змінюємо порт, бо стандартний 10250 зайнятий Kubelet-ом
+      securePort: 10260
