@@ -36,8 +36,8 @@ patches:
           storage:
             active: "s3"
             s3:
-              region: "eu-central-1"
-              bucket: "ghost-exam-images-2025"
+              region: "eu-north-1"
+              bucket: "ghost-exam-baket"
           secrets:
             s3:
               create: true
