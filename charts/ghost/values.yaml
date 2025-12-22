@@ -70,7 +70,17 @@ storage:
 adapter:
   enabled: true
   image: node:18-alpine
-  installCommand: "mkdir -p /tmp/s3-adapter && cd /tmp/s3-adapter && npm install ghost-storage-adapter-s3"
+  installCommand:
+    - sh
+    - -c
+    - |
+      cd /plugin-volume
+      rm -rf *
+      npm pack ghost-storage-adapter-s3
+      tar -xzf *.tgz --strip-components=1
+      rm *.tgz
+      npm install --omit=dev --ignore-scripts --no-bin-links
+      chown -R 1000:1000 .
   path: "/var/lib/ghost/content/adapters/storage/s3"
 
 secrets:

@@ -30,7 +30,7 @@ spec:
               cp -r node_modules/ghost-storage-adapter-s3/* {{ .Values.adapter.path }}/
           volumeMounts:
             - name: s3-adapter-volume
-              mountPath: /var/lib/ghost/content/adapters
+              mountPath: /plugin-volume
       {{- end }}
 
       containers:
@@ -120,7 +120,7 @@ spec:
             # Монтуємо адаптер (якщо S3)
             {{- if eq .Values.storage.active "s3" }}
             - name: s3-adapter-volume
-              mountPath: /var/lib/ghost/content/adapters
+              mountPath: /plugin-volume
             {{- end }}
 
       volumes:
