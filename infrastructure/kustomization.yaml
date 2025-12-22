@@ -8,4 +8,4 @@ resources:
   - namespaces/staging.yaml
   - controllers/mariadb.yaml
   - controllers/cert-manager.yaml
-  - configs/cluster-issuer.yaml
+#  - configs/cluster-issuer.yaml
