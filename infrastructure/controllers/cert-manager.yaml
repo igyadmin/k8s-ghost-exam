@@ -25,3 +25,5 @@ spec:
         namespace: flux-system
   values:
     installCRDs: true # Обов'язково true, щоб встановити Custom Resources
+    startupapicheck:
+      enabled: false
