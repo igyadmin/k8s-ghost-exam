@@ -36,7 +36,7 @@ externalDatabase:
   client: mysql
   host: mariadb  # Ім'я сервісу в поточному namespace (staging або production)
   port: 3306
-  user: root
+  user: ghost
   database: ghost
   # Пароль береться з секрету
 
