@@ -20,7 +20,23 @@ ingress:
       paths:
         - path: /
           pathType: Prefix
+  annotations:
+    # Головний рядок: підключає наш ClusterIssuer
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    
+    # Примусове перенаправлення з HTTP на HTTPS
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
 
+  hosts:
+    - host: ghost.k8s.com822.dom  # Вкажіть ваш реальний домен
+      paths:
+        - path: /
+          pathType: Prefix
+
+  tls:
+    - secretName: ghost-prod-tls  # Cert-manager створить цей секрет автоматично
+      hosts:
+        - ghost.k8s.com822.dom     # Той самий домен
 resources:
   requests:
     cpu: 100m
