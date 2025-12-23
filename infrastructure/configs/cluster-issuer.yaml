@@ -5,7 +5,7 @@ metadata:
 spec:
   acme:
     # Замініть на ваш реальний email
-    email: admin@example.com
+    email: iny55@proton.me
     server: https://acme-v02.api.letsencrypt.org/directory
     privateKeySecretRef:
       name: letsencrypt-prod
