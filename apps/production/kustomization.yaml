@@ -32,7 +32,6 @@ patches:
 
           replicaCount: 2
 
-         
           storage:
             active: "s3"
             s3:
@@ -53,3 +52,11 @@ patches:
                 paths:
                   - path: /
                     pathType: Prefix
+            annotations:
+              cert-manager.io/cluster-issuer: letsencrypt-prod
+              nginx.ingress.kubernetes.io/ssl-redirect: "true"
+     
+            tls:
+              - secretName: ghost-prod-tls
+                hosts:
+                  - ghost.k8s.com822.dom

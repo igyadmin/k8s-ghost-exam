@@ -20,24 +20,10 @@ ingress:
       paths:
         - path: /
           pathType: Prefix
-  annotations:
-   
-    cert-manager.io/cluster-issuer: letsencrypt-prod
-    
-    
-    nginx.ingress.kubernetes.io/ssl-redirect: "true"
-
-  hosts:
-    - host: ghost.k8s.com822.dom  
-      paths:
-        - path: /
-          pathType: Prefix
-
-  tls:
-    - secretName: ghost-prod-tls  
-      hosts:
-        - ghost.k8s.com822.dom    
-resources:
+  annotations: {}
+  tls: {}
+ 
+ esources:
   requests:
     cpu: 100m
     memory: 256Mi
