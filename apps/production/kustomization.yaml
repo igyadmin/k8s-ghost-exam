@@ -32,7 +32,7 @@ patches:
 
           replicaCount: 2
 
-          # Перемикаємося на S3 (AWS)
+         
           storage:
             active: "s3"
             s3:

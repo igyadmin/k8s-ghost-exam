@@ -10,12 +10,12 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  # Цей клас прийде з values (nginx)
+  
   {{- if .Values.ingress.className }}
   ingressClassName: {{ .Values.ingress.className }}
   {{- end }}
 
-  # Гнучка генерація правил (Stage або Prod - йому байдуже)
+ 
   rules:
     {{- range .Values.ingress.hosts }}
     - host: {{ .host | quote }}
@@ -32,7 +32,7 @@ spec:
           {{- end }}
     {{- end }}
 
-  # Налаштування TLS (HTTPS), якщо є в values
+ 
   {{- if .Values.ingress.tls }}
   tls:
     {{- range .Values.ingress.tls }}

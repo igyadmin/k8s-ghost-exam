@@ -13,30 +13,30 @@ service:
   targetPort: 2368
 
 ingress:
-  enabled: false          # <--- За замовчуванням ВИМКНЕНО. Це безпечно.
+  enabled: false         
   className: "nginx"
   hosts:
-    - host: ghost.local   # <--- Нейтральний хост-заглушка
+    - host: ghost.local  
       paths:
         - path: /
           pathType: Prefix
   annotations:
-    # Головний рядок: підключає наш ClusterIssuer
+   
     cert-manager.io/cluster-issuer: letsencrypt-prod
     
-    # Примусове перенаправлення з HTTP на HTTPS
+    
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
 
   hosts:
-    - host: ghost.k8s.com822.dom  # Вкажіть ваш реальний домен
+    - host: ghost.k8s.com822.dom  
       paths:
         - path: /
           pathType: Prefix
 
   tls:
-    - secretName: ghost-prod-tls  # Cert-manager створить цей секрет автоматично
+    - secretName: ghost-prod-tls  
       hosts:
-        - ghost.k8s.com822.dom     # Той самий домен
+        - ghost.k8s.com822.dom    
 resources:
   requests:
     cpu: 100m
@@ -50,11 +50,11 @@ url: "http://localhost"
 # --- БАЗА ДАНИХ (Локальна для кожного середовища) ---
 externalDatabase:
   client: mysql
-  host: mariadb  # Ім'я сервісу в поточному namespace (staging або production)
+  host: mariadb  
   port: 3306
   user: ghost
   database: ghost
-  # Пароль береться з секрету
+ 
 
 # --- ПОШТА (Ethereal за замовчуванням) ---
 mail:
@@ -62,9 +62,9 @@ mail:
   options:
     host: "smtp.ethereal.email"
     port: 587
-    service: "" # Для Ethereal сервіс не вказуємо
+    service: "" 
     auth:
-      user: "" # Перевизначимо в release.yaml або секретах
+      user: "" 
       pass: ""
 
 # --- СХОВИЩЕ ТА АДАПТЕР ---
@@ -113,7 +113,7 @@ secrets:
     create: true
     name: ghost-mail-secret
     values:
-      password: "" # <--- Впишіть сюди ваш пароль від Ethereal один раз
+      password: ""
 
   # S3 (Тільки Prod, тому тут false)
   s3:

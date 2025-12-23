@@ -32,7 +32,7 @@ spec:
               npm install --omit=dev --ignore-scripts --no-bin-links
               chown -R 1000:1000 .
           volumeMounts:
-            - name: s3-adapter-volume  # <--- Ваша назва
+            - name: s3-adapter-volume 
               mountPath: /plugin-volume
       {{- end }}
       containers:
@@ -121,7 +121,7 @@ spec:
 
             # Монтуємо адаптер (якщо S3)
             {{- if eq .Values.storage.active "s3" }}
-            - name: s3-adapter-volume  # <--- Додайте це
+            - name: s3-adapter-volume 
               mountPath: /var/lib/ghost/content/adapters/storage/s3          
             {{- end }}
 
