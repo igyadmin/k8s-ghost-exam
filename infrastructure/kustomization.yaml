@@ -4,8 +4,5 @@ resources:
   - namespaces/infrastructure.yaml
   - configs/bitnami-repo.yaml
   - configs/mariadb-repo.yaml
-  - namespaces/production.yaml
-  - namespaces/staging.yaml
-  - controllers/mariadb.yaml
   - controllers/cert-manager.yaml
   - configs/cluster-issuer.yaml
